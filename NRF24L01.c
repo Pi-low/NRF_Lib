@@ -4,53 +4,14 @@
 static uint8_t (*p_NRF_SPI_Exchange)(uint8_t);
 static t_NRF_RX_PIPE NFR_RxPipes[6];
 static t_NRF_Registers NRFChip;
-static char baudrate[2][7] = {"1Mbps ", "2Mbps "};
-static char power[4][8] = {"-18dBm ", "-12dBm ", "-6dBm ", "0dBm"};
+//static char baudrate[2][7] = {"1Mbps ", "2Mbps "};
+//static char power[4][8] = {"-18dBm ", "-12dBm ", "-6dBm ", "0dBm"};
 
-void NRF24L01_Init(void)
+void NRF24L01_Init(uint8_t (*SPI_Exchange)(uint8_t))
 {
-    NRF_Set_SPI_Handler(SoftSPI_Exchange);
+    NRF_Set_SPI_Handler(SPI_Exchange);
     NRF_PIN_CE = 0;
     NRF_PIN_CSN = 1;
-}
-
-void NRF_PrintDetails(void)
-{
-    uint8_t var;
-    NRF_Read_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
-    NRF_Read_Register(REG_NRF_SETUP_AW, &NRFChip.AW.byte, 1u);
-    NRF_Read_Register(REG_NRF_SETUP_RETR, &NRFChip.SETUP_RETR.byte, 1u);
-    NRF_Read_Register(REG_NRF_RF_CH, &NRFChip.RF_CH.byte, 1u);
-    NRF_Read_Register(REG_NRF_RF_SETUP, &NRFChip.RF_SETUP.byte, 1u);
-    NRF_Read_Register(REG_NRF_TX_ADDR, NRFChip.TX_ADDR, 5u);
-    NRFChip.STATUS.byte = NRF_Read_Register(REG_NRF_RX_ADDR_P0, NFR_RxPipes[0].PIPE_ADDR, 5u);
-    
-    var = NRFChip.RF_SETUP.s.RF_DR;
-    
-    PrintUART("Config: ");
-    UART_PNbase(NRFChip.CONFIG.byte, UART_BIN, "\r\n");
-    PrintUART("Address Width: ");
-    UART_PNbase(NRFChip.AW.byte + 2u, UART_DEC, " bytes\r\n");
-    PrintUART("Automatic Retransmission: ");
-    UART_PNbase(NRFChip.SETUP_RETR.s.ARC, UART_DEC, "time(s) ");
-    UART_PNbase(NRFChip.SETUP_RETR.s.ARD * (uint32_t)250, UART_DEC, "us\r\n");
-    PrintUART("RF Channel freq: ");
-    UART_PNbase(NRFChip.RF_CH.s.RF_CH + 2400u, UART_DEC, "MHz\r\n");
-    PrintUART("RF setup: ");
-    PrintUART(baudrate[var]);
-    PrintUART(power[NRFChip.RF_SETUP.s.RF_PWR]);
-    UART_crlf();
-    PrintUART("TX ADDR: 0x");
-    for (var = 0; var < 5; var ++)
-    {
-        UART_PNbase(NRFChip.TX_ADDR[var], UART_HEX, "");
-    }
-    PrintUART("\r\nRX PIPE0 ADDR: 0x");
-    for (var = 0; var < 5; var ++)
-    {
-        UART_PNbase(NFR_RxPipes[0].PIPE_ADDR[var], UART_HEX, "");
-    }
-    UART_crlf();
 }
 
 void NRF_OpenReadingPipe(uint8_t PipeNo, uint8_t PipeAddr[], uint8_t PayloadLength, uint8_t AutoAck, uint8_t Enable)

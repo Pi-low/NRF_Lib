@@ -9,9 +9,6 @@
 #define	NRF24L01_H
 
 #include <xc.h>
-#include "../05_MCC_16F1575/mcc.h"
-#include "../01_Appli/Application.h"
-#include "../02_Soft_SPI/Soft_SPI.h"
 
 /*------------------------------------------------*/
 /*              NRF24L01 PHYSICAL INTERFACE       */
