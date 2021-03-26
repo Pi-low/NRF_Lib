@@ -13,8 +13,8 @@
 /*------------------------------------------------*/
 /*              NRF24L01 PHYSICAL INTERFACE       */
 /*------------------------------------------------*/
-#define NRF_PIN_CE                  CE_LAT
-#define NRF_PIN_CSN                 CS__LAT
+#define NRF_PIN_CE                  LATCbits.LATC0
+#define NRF_PIN_CSN                 LATCbits.LATC1
 
 /*------------------------------------------------*/
 /*              NRF24L01 SPI commands             */
@@ -204,7 +204,7 @@ typedef struct {
     uint8_t TX_ADDR[5];
 } t_NRF_Registers;
 
-void NRF24L01_Init(void);
+void NRF24L01_Init(uint8_t (*SPI_Exchange)(uint8_t));
 void NRF_PrintDetails(void);
 void NRF_OpenReadingPipe(uint8_t PipeNo, uint8_t PipeAddr[], uint8_t PayloadLength, uint8_t AutoAck, uint8_t Enable);
 void NRF_SetTxAddr(uint8_t *PipeAddr);

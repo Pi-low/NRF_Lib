@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "NRF24L01.h"
+#include "../target.h"
 
 static uint8_t (*p_NRF_SPI_Exchange)(uint8_t);
 static t_NRF_RX_PIPE NFR_RxPipes[6];
