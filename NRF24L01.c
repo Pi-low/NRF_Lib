@@ -86,6 +86,13 @@ void NRF_SetPrimaryAs(uint8_t asPrimary)
     NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
 }
 
+void NRF_SetCRCLen(uint8_t Len)
+{
+    NRF_Read_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
+    NRFChip.CONFIG.s.CRCO = Len;
+    NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
+}
+
 void NRF_SetRFChannel(uint8_t RF_Channel)
 {
     NRFChip.RF_CH.byte = (RF_Channel > 125u) ? 125u : RF_Channel;
@@ -124,6 +131,7 @@ void NRF_SetART(uint8_t count, uint8_t delay)
 void NRF_StartListening(void)
 {
     NRF_Read_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
+    NRFChip.CONFIG.s.PRIM_RX = 1u;
     NRFChip.CONFIG.s.PWR_UP = 1u;
     NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
     NRF_PIN_CE = 1;
@@ -131,6 +139,9 @@ void NRF_StartListening(void)
 
 void NRF_StopListening(void)
 {
+    NRF_Read_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
+    NRFChip.CONFIG.s.PRIM_RX = 0u;
+    NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
     NRF_PIN_CE = 0;
 }
 

@@ -213,6 +213,7 @@ void NRF_PipeDisable(uint8_t PipeNo);
 void NRF_PipeEnableAA(uint8_t PipeNo);
 void NRF_PipeDisableAA(uint8_t PipeNo);
 void NRF_SetPrimaryAs(uint8_t asPrimary);
+void NRF_SetCRCLen(uint8_t Len);
 void NRF_SetRFChannel(uint8_t RF_Channel);
 void NRF_SetRFPower(uint8_t RF_Pow);
 void NRF_SetRFDataRate(uint8_t Datarate);
