@@ -66,11 +66,9 @@
 /*              NRF24L01 Register bits            */
 /*------------------------------------------------*/
 /*        CONFIG        */
-#define NRF_PRX                     1u
-#define NRF_PTX                     0u
-#define NRF_IRQ_MAX_RT              1u
-#define NRF_IRQ_TX_DS               2u
-#define NRF_IRQ_RX_DR               4u
+#define NRF_IRQ_MAX_RT              0x10U
+#define NRF_IRQ_TX_DS               0x20U
+#define NRF_IRQ_RX_DR               0x40U
 
 /*    ADDRESS_WIDTH     */
 #define NRF_ADDR_3BYTES             0x01u

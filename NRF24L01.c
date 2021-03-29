@@ -5,8 +5,6 @@
 static uint8_t (*p_NRF_SPI_Exchange)(uint8_t);
 static t_NRF_RX_PIPE NFR_RxPipes[6];
 static t_NRF_Registers NRFChip;
-//static char baudrate[2][7] = {"1Mbps ", "2Mbps "};
-//static char power[4][8] = {"-18dBm ", "-12dBm ", "-6dBm ", "0dBm"};
 
 void NRF24L01_Init(uint8_t (*SPI_Exchange)(uint8_t))
 {
@@ -167,7 +165,8 @@ uint8_t NRF_GetStatus(void)
 void NRF_SetMaskIRQ(uint8_t IRQMask)
 {
     NRF_Read_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
-    NRFChip.CONFIG.byte = IRQMask & 0x07;
+    NRFChip.CONFIG.byte |= IRQMask & 0xF0;
+    NRFChip.CONFIG.byte &= IRQMask | 0x0F;
     NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
 }
 
