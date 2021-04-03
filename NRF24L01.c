@@ -248,11 +248,6 @@ void NRF_StatusHandler(void)
     }
 }
 
-void NRF_IRQ_ISR_Handler(void)
-{
-    
-}
-
 void NRF_Set_SPI_Handler (uint8_t(*SPI_Handler)(uint8_t))
 {
     p_NRF_SPI_Exchange = SPI_Handler;
