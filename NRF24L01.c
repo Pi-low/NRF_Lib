@@ -5,10 +5,70 @@
 static uint8_t (*p_NRF_SPI_Exchange)(uint8_t);
 static t_NRF_RX_PIPE NFR_RxPipes[6];
 static t_NRF_Registers NRFChip;
+static uint8_t NRF_Write_Register(uint8_t Register, uint8_t Bytes[], uint8_t Length);
+static uint8_t NRF_Read_Register(uint8_t Register, uint8_t Bytes[], uint8_t Length);
+
+void NRF_Set_SPI_Handler (uint8_t(*SPI_Handler)(uint8_t))
+{
+    p_NRF_SPI_Exchange = SPI_Handler;
+}
 
 void NRF24L01_Init(uint8_t (*SPI_Exchange)(uint8_t))
 {
     NRF_Set_SPI_Handler(SPI_Exchange);
+    NRF_PIN_CE = 0;
+    NRF_PIN_CSN = 1;
+}
+
+static uint8_t NRF_Write_Register(uint8_t Register, uint8_t Bytes[], uint8_t Length)
+{
+    uint8_t Status = 0, i = 0;
+    NRF_PIN_CSN = 0;
+    Status = p_NRF_SPI_Exchange(CMD_NRF_W_REGISTER | Register);
+    for (i = 0; i < Length; i++) {
+        p_NRF_SPI_Exchange(Bytes[i]);
+    }
+    NRF_PIN_CSN = 1;
+    return Status;
+}
+
+static uint8_t NRF_Read_Register(uint8_t Register, uint8_t Bytes[], uint8_t Length)
+{
+    uint8_t Status = 0, i = 0;
+    NRF_PIN_CSN = 0;
+    Status = p_NRF_SPI_Exchange(CMD_NRF_R_REGISTER | Register);
+    for (i = 0; i < Length; i++) {
+        Bytes[i] = p_NRF_SPI_Exchange(CMD_NRF_NOP);
+    }
+    NRF_PIN_CSN = 1;
+    return Status;
+}
+
+void NRF_ReadPayload(uint8_t Payload[], uint8_t PayloadLength)
+{
+    uint8_t i;
+    NRF_PIN_CSN = 0;
+    NRFChip.STATUS.byte = p_NRF_SPI_Exchange(CMD_NRF_R_RX_PAYLOAD);
+    for (i = 0; i < PayloadLength; i++)
+    {
+        Payload[i] = p_NRF_SPI_Exchange(CMD_NRF_NOP);
+    }
+    NRF_PIN_CSN = 1;
+    NRFChip.STATUS.s.RX_DR = 1u;
+    NRF_Write_Register(REG_NRF_STATUS, &NRFChip.STATUS.byte, 1u);
+}
+
+void NRF_WritePayload(uint8_t Payload[], uint8_t PayloadLength)
+{
+    uint8_t i;
+    NRF_PIN_CSN = 0;
+    NRFChip.STATUS.byte = p_NRF_SPI_Exchange(CMD_NRF_W_TX_REGISTER);
+    for (i = 0; i < PayloadLength; i++)
+    {
+        p_NRF_SPI_Exchange(Payload[i]);
+    }
+    NRF_PIN_CE = 1;
+    __delay_us(25);
     NRF_PIN_CE = 0;
     NRF_PIN_CSN = 1;
 }
@@ -168,87 +228,4 @@ void NRF_SetMaskIRQ(uint8_t IRQMask)
     NRFChip.CONFIG.byte |= IRQMask & 0xF0;
     NRFChip.CONFIG.byte &= IRQMask | 0x0F;
     NRFChip.STATUS.byte = NRF_Write_Register(REG_NRF_CONFIG, &NRFChip.CONFIG.byte, 1u);
-}
-
-void NRF_ReadPayload(uint8_t *Payload, uint8_t PayloadLength)
-{
-    uint8_t i;
-    NRF_PIN_CSN = 0;
-    NRFChip.STATUS.byte = p_NRF_SPI_Exchange(CMD_NRF_R_RX_PAYLOAD);
-    for (i = 0; i < PayloadLength; i++)
-    {
-        Payload[i] = p_NRF_SPI_Exchange(CMD_NRF_NOP);
-    }
-    NRF_PIN_CSN = 1;
-    NRFChip.STATUS.s.RX_DR = 1u;
-    NRF_Write_Register(REG_NRF_STATUS, &NRFChip.STATUS.byte, 1u);
-}
-
-void NRF_WritePayload(uint8_t *Payload, uint8_t PayloadLength)
-{
-    uint8_t i;
-    NRF_PIN_CSN = 0;
-    NRFChip.STATUS.byte = p_NRF_SPI_Exchange(CMD_NRF_W_TX_REGISTER);
-    for (i = 0; i < PayloadLength; i++)
-    {
-        p_NRF_SPI_Exchange(Payload[i]);
-    }
-    NRF_PIN_CE = 1;
-    __delay_us(25);
-    NRF_PIN_CE = 0;
-    NRF_PIN_CSN = 1;
-}
-
-uint8_t NRF_Write_Register(uint8_t Register, uint8_t *Bytes, uint8_t Length)
-{
-    uint8_t Status = 0u;
-    NRF_PIN_CSN = 0;
-    Status = p_NRF_SPI_Exchange(CMD_NRF_W_REGISTER | Register);
-    while (Length--)
-    {
-        p_NRF_SPI_Exchange(*Bytes++);
-    }
-    NRF_PIN_CSN = 1;
-    return Status;
-}
-
-uint8_t NRF_Read_Register(uint8_t Register, uint8_t *Bytes, uint8_t Length)
-{
-    uint8_t Status = 0u;
-    NRF_PIN_CSN = 0;
-    Status = p_NRF_SPI_Exchange(CMD_NRF_R_REGISTER | Register);
-    while (Length--)
-    {
-        *Bytes++ = p_NRF_SPI_Exchange(CMD_NRF_NOP);
-    }
-    NRF_PIN_CSN = 1;
-    return Status;
-}
-
-void NRF_StatusHandler(void)
-{
-    u_NRF_Status StatusReg;
-    u_NRF_FIFO_Status NRF_Fifo;
-    StatusReg.byte = NRF_Read_Register(REG_NRF_FIFO_STATUS, &NRF_Fifo.byte, 1u);
-    switch (StatusReg.byte >> 4)
-    {
-        case 1:     /* MAX_RT on going */
-            break;
-        case 2:     /* TX_DS on going */
-            break;
-        case 4:     /* RX_DR on going */
-            if (NRF_Fifo.s.RX_FULL == 1u)
-            {
-                p_NRF_SPI_Exchange(CMD_NRF_FLUSH_RX);
-            }
-            else { /* Do nothing */ }
-            break;
-        default:
-            break;
-    }
-}
-
-void NRF_Set_SPI_Handler (uint8_t(*SPI_Handler)(uint8_t))
-{
-    p_NRF_SPI_Exchange = SPI_Handler;
 }

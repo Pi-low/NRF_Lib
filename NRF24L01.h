@@ -227,10 +227,7 @@ void NRF_StartListening(void);
 uint8_t NRF_Available(void);
 uint8_t NRF_GetStatus(void);
 void NRF_SetMaskIRQ(uint8_t IRQMask);
-void NRF_ReadPayload(uint8_t *Payload, uint8_t PayloadLength);
-void NRF_WritePayload(uint8_t *Payload, uint8_t PayloadLength);
-uint8_t NRF_Write_Register(uint8_t Register, uint8_t *Bytes, uint8_t Length);
-uint8_t NRF_Read_Register(uint8_t Register, uint8_t *Bytes, uint8_t Length);
-void NRF_StatusHandler(void);
+void NRF_ReadPayload(uint8_t Payload[], uint8_t PayloadLength);
+void NRF_WritePayload(uint8_t Payload[], uint8_t PayloadLength);
 void NRF_Set_SPI_Handler(uint8_t (*SPI_Handler)(uint8_t));
 #endif /* NRF24L01_H */
