@@ -224,7 +224,7 @@ void NRF_SetRFDataRate(uint8_t Datarate);
 void NRF_SetAddrWidth(uint8_t AddressWidth);
 void NRF_SetART(uint8_t count, uint8_t delay);
 void NRF_StartListening(void);
-uint8_t NRF_Available(uint8_t PipeNo);
+uint8_t NRF_Available(void);
 uint8_t NRF_GetStatus(void);
 void NRF_SetMaskIRQ(uint8_t IRQMask);
 void NRF_ReadPayload(uint8_t *Payload, uint8_t PayloadLength);

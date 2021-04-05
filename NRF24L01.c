@@ -143,15 +143,15 @@ void NRF_StopListening(void)
     NRF_PIN_CE = 0;
 }
 
-uint8_t NRF_Available(uint8_t PipeNo)
+uint8_t NRF_Available(void)
 {
-    uint8_t IsAvailable = 0;
+    uint8_t PipiNo = 255;
     NRF_GetStatus();
-    if ((NRFChip.STATUS.s.RX_P_NO == PipeNo) && (NRFChip.STATUS.s.RX_DR == 1))
+    if (NRFChip.STATUS.s.RX_DR == 1)
     {
-        IsAvailable = 1;
+        PipiNo = NRFChip.STATUS.s.RX_P_NO;
     }
-    return IsAvailable;
+    return PipiNo;
 }
 
 uint8_t NRF_GetStatus(void)
