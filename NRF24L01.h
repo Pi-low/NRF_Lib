@@ -66,15 +66,15 @@
 /*              NRF24L01 Register bits            */
 /*------------------------------------------------*/
 /*        CONFIG        */
-#define NRF_IRQ_MAX_RT              0x10U
-#define NRF_IRQ_TX_DS               0x20U
-#define NRF_IRQ_RX_DR               0x40U
-#define PIPE0 0U
-#define PIPE1 1U
-#define PIPE2 2U
-#define PIPE3 3U
-#define PIPE4 4U
-#define PIPE5 5U
+#define NRF_IRQ_MAX_RT              0x10u
+#define NRF_IRQ_TX_DS               0x20u
+#define NRF_IRQ_RX_DR               0x40u
+#define PIPE0 0u
+#define PIPE1 1u
+#define PIPE2 2u
+#define PIPE3 3u
+#define PIPE4 4u
+#define PIPE5 5u
 
 /*    ADDRESS_WIDTH     */
 #define NRF_ADDR_3BYTES             0x01u
